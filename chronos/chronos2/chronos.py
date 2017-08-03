@@ -38,8 +38,8 @@ class Monitor(object):
     def set_stla_api_token_header(self):
 
         # Get token for API requests
-        user = config['sentinella']['user']
-        passwd = config['sentinella']['password']
+        user = _config['sentinella']['user']
+        passwd = _config['sentinella']['password']
         data_to_send = {'email': user, 'password': passwd}
         api = _config['sentinella']['endpoint']
         verify = bool(_config['sentinella']['verify_ssl'])
