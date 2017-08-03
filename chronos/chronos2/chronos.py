@@ -15,18 +15,45 @@ logger = logging.getLogger(__name__)
 frequency = 60
 hostname = os.uname()[1].split('.')[0]
 
+
 class Monitor(object):
-    
+
     def __init__(self):
-        self.url = "%s%s:%s/query?pretty=true&u=%s&p=%s&db=%s&q=" % (config['INFLUX_PROTOCOL'], config['INFLUX_HOST'], config['INFLUX_PORT'], config['INFLUX_USER'], config['INFLUX_PASSWORD'], config['INFLUX_DB'])
+        protocol = config['INFLUX_PROTOCOL']
+        host = config['INFLUX_HOST']
+        port = config['INFLUX_PORT']
+        user = config['INFLUX_USER']
+        passwd = config['INFLUX_PASSWORD']
+        db = config['INFLUX_DB']
+        self.url = "%s%s:%s/query?pretty=true&u=%s&p=%s&db=%s&q=" % (
+            protocol,
+            host,
+            port,
+            user,
+            passwd,
+            db
+        )
         self.set_stla_api_token_header()
-        
+
     def set_stla_api_token_header(self):
+
         # Get token for API requests
-        data_to_send = {'email':_config['sentinella']['user'], 'password':_config['sentinella']['password']}
-        response = requests.post(_config['sentinella']['endpoint'] + '/accounts/auth/token', verify=bool(_config['sentinella']['verify_ssl']), json=data_to_send)
+        user = config['sentinella']['user']
+        passwd = config['sentinella']['password']
+        data_to_send = {'email': user, 'password': passwd}
+        api = _config['sentinella']['endpoint']
+        verify = bool(_config['sentinella']['verify_ssl'])
+        endpoint = api + '/accounts/auth/token'
+
+        response = requests.post(endpoint, verify=verify, json=data_to_send)
         if response.status_code == 200:
-            self.stla_api_token_header = {'Authorization': 'JWT ' + response.json()['access_token']}
+
+            access_token = response.json()['access_token']
+
+            api_token_header = {'Authorization': 'JWT ' + access_token}
+
+            self.stla_api_token_header = api_token_header
+
         else:
             self.set_stla_api_token_header()
             
